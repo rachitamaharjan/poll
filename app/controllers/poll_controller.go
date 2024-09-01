@@ -7,7 +7,7 @@ import (
 
 func PollController(router *gin.RouterGroup) {
 	router.GET("/", handlers.GetPolls)
-	router.GET("/:id", handlers.GetPollByID)
 	router.POST("/", handlers.CreatePoll)
+	router.GET("/:id", handlers.GetPollByID)
 	router.POST("/:id/vote", handlers.VotePoll)
 }
