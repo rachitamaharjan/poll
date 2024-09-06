@@ -29,6 +29,11 @@ type Option struct {
 	VoteCount int    `json:"voteCount" gorm:"default:0"`
 }
 
+type VoteJob struct {
+	PollID      uint
+	OptionIndex int
+}
+
 func GetPollByID(c *gin.Context, id uint) (*Poll, error) {
 	poll := &Poll{}
 	result := db.DB.Preload("Options").First(poll, id)
