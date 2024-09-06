@@ -2,11 +2,16 @@ package models
 
 import (
 	"log"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rachitamaharjan/leave-management-system/db"
 	"gorm.io/gorm"
+)
+
+var (
+	mu sync.Mutex // Mutex to ensure thread-safe operations
 )
 
 // Poll represents a poll with a question and multiple options.
@@ -65,6 +70,10 @@ func UpdatePollVotes(pollID uint, optionIndex int) error {
 	if err != nil {
 		return err
 	}
+
+	// For thread safety using mutex
+	mu.Lock()
+	defer mu.Unlock()
 
 	option.VoteCount += 1
 
