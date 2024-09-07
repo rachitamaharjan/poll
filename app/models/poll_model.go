@@ -28,9 +28,9 @@ type Poll struct {
 // Option represents an individual poll option with a vote count.
 type Option struct {
 	gorm.Model
-	ID        uint `gorm:"primaryKey"`
-	PollID    uint
-	Text      string `gorm:"type:text"`
+	ID        uint   `gorm:"primaryKey"`
+	PollID    uint   `json:"pollId"`
+	Text      string `json:"text" gorm:"type:text"`
 	VoteCount int    `json:"voteCount" gorm:"default:0"`
 }
 
