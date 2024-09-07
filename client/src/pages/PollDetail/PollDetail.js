@@ -20,9 +20,9 @@ const PollDetail = () => {
         <div>
           <h1>{poll.question}</h1>
           <ul>
-            {poll.options.map((option, index) => (
+            {poll.options?.map((option, index) => (
               <li key={index}>
-                <button onClick={() => handleVote(index)}>{option.text}</button> - Votes: {option.voteCount}
+                <button onClick={() => handleVote(index)}>{option?.text}</button> - Votes: {option?.voteCount}
               </li>
             ))}
           </ul>

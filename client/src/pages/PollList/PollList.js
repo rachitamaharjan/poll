@@ -14,7 +14,7 @@ const PollList = () => {
     <div>
       <h1>Polls</h1>
       <ul>
-        {polls.map(poll => (
+        {polls?.map(poll => (
           <li key={poll.id}>
             <Link to={`/polls/${poll.id}`}>{poll.question}</Link>
           </li>
