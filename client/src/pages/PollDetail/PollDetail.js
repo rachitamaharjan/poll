@@ -10,8 +10,6 @@ const PollDetail = () => {
     fetchPollById(id);
   }, [id]);
 
-  if (!poll) return <p>Loading poll...</p>;
-
   const handleVote = (optionIndex) => {
     votePoll(id, optionIndex);
   };
@@ -30,7 +28,7 @@ const PollDetail = () => {
           </ul>
         </div>
       ) : (
-        <p>Loading...</p>
+        <p>Loading Poll...</p>
       )}
     </div>
   );

@@ -13,6 +13,7 @@ function App() {
         <Routes>
           <Route path="/polls" element={<PollList />} />
           <Route path="/polls/:id" element={<PollDetail />} />
+          <Route path="/polls/:id/results" element={<PollResults />} />
         </Routes>
       </div>
   </PollProvider>
