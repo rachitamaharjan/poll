@@ -1,0 +1,29 @@
+.create-poll-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.poll-option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.add-option-btn, .remove-option-btn, .submit-btn {
+  background-color: #36A2EB;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  margin: 5px 0;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}

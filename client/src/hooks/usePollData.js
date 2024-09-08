@@ -1,10 +1,43 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 const usePollData = () => {
   const [polls, setPolls] = useState([]);
   const [poll, setPoll] = useState(null);
+  const [loading, setLoading] = useState(false);  // For loading states
+  const [error, setError] = useState(null);  // To handle errors
+
+   // Create a new poll
+   const createPoll = useCallback(async (pollData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('http://localhost:8080/v1/api/polls/', {
+        method: 'POST',
+        body: JSON.stringify(pollData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: 'cors',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Fetch error:', response.status, errorData);
+        throw new Error('Failed to create poll');
+      }
+      const newPoll = await response.json();
+      setPolls((prevPolls) => [...prevPolls, newPoll]);  // Add new poll to the list
+    } catch (err) {
+      console.error('Error creating poll:', err);
+      setError('Failed to create poll');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const fetchPolls = async () => {
+    setLoading(true);
+    setError(null);  // Reset error before fetching
     const response = await fetch('/v1/api/polls');
     const data = await response.json();
     setPolls(data);
@@ -43,6 +76,7 @@ const usePollData = () => {
   };
 
   return {
+    createPoll,
     polls,
     poll,
     fetchPolls,
