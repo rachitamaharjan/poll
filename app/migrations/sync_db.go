@@ -1,8 +1,8 @@
 package migrations
 
 import (
-	"github.com/rachitamaharjan/leave-management-system/db"
-	"github.com/rachitamaharjan/leave-management-system/models"
+	"github.com/rachitamaharjan/poll/db"
+	"github.com/rachitamaharjan/poll/models"
 )
 
 func SyncDB() {

@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/rachitamaharjan/leave-management-system/constants"
-	handlers "github.com/rachitamaharjan/leave-management-system/handlers"
-	"github.com/rachitamaharjan/leave-management-system/middlewares"
+	"github.com/rachitamaharjan/poll/constants"
+	handlers "github.com/rachitamaharjan/poll/handlers"
+	"github.com/rachitamaharjan/poll/middlewares"
 )
 
 func AuthController(router *gin.RouterGroup) {

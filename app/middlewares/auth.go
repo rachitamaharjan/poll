@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/rachitamaharjan/leave-management-system/db"
-	"github.com/rachitamaharjan/leave-management-system/models"
+	"github.com/rachitamaharjan/poll/db"
+	"github.com/rachitamaharjan/poll/models"
 )
 
 func RequireAuth(c *gin.Context) {

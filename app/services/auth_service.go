@@ -9,8 +9,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/rachitamaharjan/leave-management-system/db"
-	"github.com/rachitamaharjan/leave-management-system/models"
+	"github.com/rachitamaharjan/poll/db"
+	"github.com/rachitamaharjan/poll/models"
 )
 
 func SignUp(c *gin.Context, r models.SignUpRequest) error {

@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	handlers "github.com/rachitamaharjan/leave-management-system/handlers"
+	handlers "github.com/rachitamaharjan/poll/handlers"
 )
 
 func PollController(router *gin.RouterGroup) {

@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rachitamaharjan/leave-management-system/models"
+	"github.com/rachitamaharjan/poll/models"
 )
 var (
 	jobQueue chan models.VoteJob

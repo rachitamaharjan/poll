@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/rachitamaharjan/leave-management-system/constants"
-	"github.com/rachitamaharjan/leave-management-system/controllers"
+	"github.com/rachitamaharjan/poll/constants"
+	"github.com/rachitamaharjan/poll/controllers"
 )
 
 func setupPollRoutes(router *gin.RouterGroup) {

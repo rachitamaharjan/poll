@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rachitamaharjan/leave-management-system/models"
-	"github.com/rachitamaharjan/leave-management-system/services"
+	"github.com/rachitamaharjan/poll/models"
+	"github.com/rachitamaharjan/poll/services"
 )
 
 func SignUp(c *gin.Context) {

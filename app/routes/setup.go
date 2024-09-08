@@ -3,7 +3,7 @@ package routes
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/rachitamaharjan/leave-management-system/constants"
+	"github.com/rachitamaharjan/poll/constants"
 )
 
 func SetupRouter() *gin.Engine {

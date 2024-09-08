@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/rachitamaharjan/leave-management-system/db"
-	"github.com/rachitamaharjan/leave-management-system/env"
-	"github.com/rachitamaharjan/leave-management-system/migrations"
-	"github.com/rachitamaharjan/leave-management-system/routes"
+	"github.com/rachitamaharjan/poll/db"
+	"github.com/rachitamaharjan/poll/env"
+	"github.com/rachitamaharjan/poll/migrations"
+	"github.com/rachitamaharjan/poll/routes"
 )
 
 func init() {

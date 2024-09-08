@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rachitamaharjan/leave-management-system/db"
+	"github.com/rachitamaharjan/poll/db"
 	"gorm.io/gorm"
 )
 
