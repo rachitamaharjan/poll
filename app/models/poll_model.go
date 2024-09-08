@@ -34,6 +34,10 @@ type Option struct {
 	VoteCount int    `json:"voteCount" gorm:"default:0"`
 }
 
+type VoteRequest struct {
+	OptionIndex int `json:"optionIndex"`
+}
+
 type VoteJob struct {
 	PollID      uint
 	OptionIndex int
