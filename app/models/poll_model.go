@@ -64,22 +64,37 @@ func SavePoll(c *gin.Context, poll Poll) (int, error) {
 }
 
 // UpdatePollVotes increments the vote count for a specific option in the poll.
-func UpdatePollVotes(pollID uint, optionIndex int) error {
+func UpdatePollVotes(pollID uint, optionIndex int) (*Poll, error) {
 	var option Option
+	var poll Poll
 
+	// Fetch the option to be updated
 	err := db.DB.Where("poll_id = ?", pollID).
 		Offset(optionIndex). // Skip to the correct index
 		Limit(1).            // Get only one option
 		First(&option).Error
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// For thread safety using mutex
 	mu.Lock()
 	defer mu.Unlock()
 
+	// Increment the vote count for the selected option
 	option.VoteCount += 1
 
-	return db.DB.Save(&option).Error
+	// Save the updated option
+	err = db.DB.Save(&option).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// Fetch the updated poll with its options
+	err = db.DB.Where("id = ?", pollID).Preload("Options").First(&poll).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &poll, nil
 }

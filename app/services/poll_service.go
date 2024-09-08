@@ -2,14 +2,20 @@ package services
 
 import (
 	"log"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rachitamaharjan/poll/models"
 )
 
-var (
-	jobQueue chan models.VoteJob
-)
+var jobQueue = make(chan models.VoteJob, 100) // Initialize the job queue once
+var once sync.Once
+
+func init() {
+	once.Do(func() {
+		go processJobQueue() // Start the goroutine to process the queue
+	})
+}
 
 func GetPollByID(c *gin.Context, pollId int) (*models.Poll, error) {
 	poll, err := models.GetPollByID(c, uint(pollId))
@@ -29,22 +35,20 @@ func CreatePoll(c *gin.Context, newPoll models.Poll) (int, error) {
 }
 
 func VotePoll(pollId int, vote models.VoteRequest) {
-
-	// Initialize the job queue
-	jobQueue = make(chan models.VoteJob, 100) // Buffered channel to handle 100 votes at a time
-
 	// Enqueue the vote job
 	jobQueue <- models.VoteJob{
 		PollID:      uint(pollId),
 		OptionIndex: vote.OptionIndex,
 	}
+}
 
-	// Increment the vote count for the selected option
-	go func() {
-		for job := range jobQueue {
-			if err := models.UpdatePollVotes(job.PollID, job.OptionIndex); err != nil {
-				log.Printf("Failed to update vote: %v", err)
-			}
+func processJobQueue() {
+	for job := range jobQueue {
+		_, err := models.UpdatePollVotes(job.PollID, job.OptionIndex)
+		if err != nil {
+			log.Printf("Failed to update vote: %v", err)
+			continue
 		}
-	}()
+
+	}
 }
