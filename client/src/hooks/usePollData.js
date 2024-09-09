@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import usePollStream from './usePollStream';
 
 const usePollData = () => {
   const [polls, setPolls] = useState([]);
@@ -74,6 +75,23 @@ const usePollData = () => {
     });
     fetchPollById(id); // Refresh poll data
   };
+
+  // Listen for live poll updates via SSE
+  const livePollUpdate = usePollStream(poll?.id);
+
+  // Update the current poll when new data comes in from SSE
+  useEffect(() => {
+    if (livePollUpdate) {
+      debugger
+      // Update the poll when new data comes in
+      setPoll((prevPoll) => {
+        if (prevPoll?.id === livePollUpdate.id) {
+          return { ...prevPoll, ...livePollUpdate }; // Merge live updates into the poll
+        }
+        return prevPoll;
+      });
+    }
+  }, [livePollUpdate]);
 
   return {
     createPoll,

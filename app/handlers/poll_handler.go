@@ -52,3 +52,15 @@ func VotePoll(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Vote recorded"})
 }
+
+func PollsStream(c *gin.Context) {
+	pollID := c.Param("id")
+
+	// Set the headers to indicate an SSE stream
+	c.Writer.Header().Set("Content-Type", "text/event-stream")
+	c.Writer.Header().Set("Cache-Control", "no-cache")
+	c.Writer.Header().Set("Connection", "keep-alive")
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+
+	services.PollsStream(c, pollID)
+}
