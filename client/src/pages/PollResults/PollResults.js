@@ -10,7 +10,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const PollResults = () => {
   const { id } = useParams();
-  const { poll, fetchPollById, votePoll } = usePollContext();
+  const { poll, fetchPollById, error, loading } = usePollContext();
 
   useEffect(() => {
     fetchPollById(id);
@@ -19,6 +19,10 @@ const PollResults = () => {
   const totalVotes = useMemo(() => {
     return poll?.options.reduce((acc, option) => acc + option.voteCount, 0) || 0;
   }, [poll]);
+
+  if (error) {
+    return <p>Error loading poll: {error}</p>;
+  }
 
   const getVotePercentage = (voteCount) => {
     return totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(2) : 0;
@@ -36,6 +40,10 @@ const PollResults = () => {
       },
     ],
   };
+
+  if (loading) {
+    return <p>Loading Poll...</p>;
+  }
 
   return (
     <>

@@ -42,9 +42,12 @@ const usePollData = () => {
     const response = await fetch('/v1/api/polls');
     const data = await response.json();
     setPolls(data);
+    setLoading(false);
   };
 
   const fetchPollById = async (id) => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await fetch(`http://localhost:8080/v1/api/polls/${id}`,
         {
@@ -62,6 +65,8 @@ const usePollData = () => {
       setPoll(data);
     } catch (error) {
       console.error('Error fetching poll:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -100,6 +105,8 @@ const usePollData = () => {
     fetchPolls,
     fetchPollById,
     votePoll,
+    error,
+    loading
   };
 };
 
