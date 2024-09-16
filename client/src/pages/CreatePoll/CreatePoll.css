@@ -15,7 +15,30 @@ h2 {
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.form-group input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.form-group label[for="allowMultipleVotes"] {
+  display: inline;
+  font-weight: normal;
+  font-size: 14px;
 }
 
 label {
@@ -67,11 +90,11 @@ input[type="text"] {
 
 }
 
-.add-option-btn:hover, .submit-btn:hover {
+.add-option-btn:hover {
   background: #2f8256;
 }
 
-.add-option-btn:hover, .submit-btn:hover {
+.submit-btn:hover {
   background: #407ab8;
 }
 

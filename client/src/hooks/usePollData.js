@@ -6,6 +6,7 @@ const usePollData = () => {
   const [polls, setPolls] = useState([]);
   const [poll, setPoll] = useState(null);
   const [loading, setLoading] = useState(false);  // For loading states
+  const [status, setStatus] = useState("");  // To handle status
   const [error, setError] = useState(null);  // To handle errors
   const [shareUrl, setShareUrl] = useState(''); // To store the share URL of the created poll
 
@@ -75,9 +76,22 @@ const usePollData = () => {
         },
       });
       fetchPollById(id); // Refresh poll data
+      setStatus("Your vote has been cast! Thank you for participating.")
     } catch (err) {
+        // Handle errors based on the response status and data
+        if (err.response) {
+          console.log("err ", err.response)
+          if (err.response.status === 400) {
+            setError(err.response.data.error || 'Failed to vote on poll');
+          } else {
+            setError('An error occurred while voting on the poll');
+          }
+        } else if (err.request) {
+          setError('No response received from the server');
+        } else {
+          setError('An unexpected error occurred');
+        }      
       console.error('Error voting on poll:', err);
-      setError('Failed to vote on poll');
     }
   };
 
@@ -104,6 +118,7 @@ const usePollData = () => {
     fetchPolls,
     fetchPollById,
     votePoll,
+    status,
     error,
     loading,
     shareUrl

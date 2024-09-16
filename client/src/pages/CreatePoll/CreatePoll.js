@@ -9,6 +9,7 @@ import './CreatePoll.css';
 const CreatePoll = () => {
   const { createPoll, shareUrl } = usePollContext();
   const [question, setQuestion] = useState('');
+  const [allowMultipleVotes, setAllowMultipleVotes] = useState(false);
   const [options, setOptions] = useState([{ text: '' }]);
   const [error, setError] = useState(null);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
@@ -39,7 +40,7 @@ const CreatePoll = () => {
     }
 
     try {
-      await createPoll({ question, options }); // Call Context API method to create poll
+      await createPoll({ question, options, allowMultipleVotes }); // Call Context API method to create poll
       setSuccessModalOpen(true);
     } catch (error) {
       setError('Failed to create poll. Please try again.');
@@ -95,6 +96,16 @@ const CreatePoll = () => {
           </button>
         </div>
 
+        <div className="form-group">
+          <input
+            type="checkbox"
+            id="allowMultipleVotes"
+            checked={allowMultipleVotes}
+            onChange={(e) => setAllowMultipleVotes(e.target.checked)}
+          />
+          <label htmlFor="allowMultipleVotes">Allow multiple votes per user</label>
+        </div>
+        
         {error && <p className="error-message">{error}</p>}
 
         <button type="submit" className="submit-btn">

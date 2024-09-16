@@ -6,9 +6,8 @@ import './PollDetail.css';
 
 const PollDetail = () => {
   const { id } = useParams();
-  const { poll, fetchPollById, votePoll } = usePollContext();
+  const { poll, fetchPollById, votePoll, status, error } = usePollContext();
   const navigate = useNavigate();
-  const [voteStatus, setVoteStatus] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,7 +17,6 @@ const PollDetail = () => {
         setLoading(false);
       } catch (error) {
         setLoading(false);
-        setVoteStatus('Failed to load poll data.');
       }
     };
 
@@ -27,12 +25,6 @@ const PollDetail = () => {
 
   const handleVote = (optionIndex) => {
     votePoll(id, optionIndex)
-      .then(() => {
-        setVoteStatus('Your vote has been cast! Thank you for participating.');
-      })
-      .catch(() => {
-        setVoteStatus('Failed to cast vote. Please try again.');
-      });
   };
 
   const handleViewResults = () => {
@@ -50,7 +42,6 @@ const PollDetail = () => {
           {poll ? (
             <>
               <h2 className="poll-question">{poll.question}</h2>
-              <p className="interactive-message">Your vote is important! Choose the option that you believe is the best.</p>
               <div className="poll-options">
                 <ul>
                   {poll.options?.map((option, index) => (
@@ -71,7 +62,8 @@ const PollDetail = () => {
               ) : (
                 <p className="total-votes">Be the first to vote!</p>
               )}
-              {voteStatus && <p className="vote-status-message">{voteStatus}</p>}
+              {status && <p className="vote-status-message">{status}</p>}
+              {error && <p className="vote-error-message">{error}</p>}
               <button 
                 className="view-results-button" 
                 onClick={handleViewResults}

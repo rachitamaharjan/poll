@@ -76,6 +76,14 @@
   margin-top: 20px;
 }
 
+.vote-error-message {
+  font-size: 16px;
+  color: #782b2b;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+}
+
 .view-results-button {
   float: right;
   background-color: #32659c;
