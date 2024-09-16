@@ -12,7 +12,6 @@ func SetupRouter() *gin.Engine {
 
 	v1 := router.Group(constants.API_V1)
 
-	setupAuthRoutes(v1)
 	setupPollRoutes(v1)
 	return router
 }
