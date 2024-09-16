@@ -3,12 +3,12 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/rachitamaharjan/poll/models"
+	"github.com/sirupsen/logrus"
 )
 
 var jobQueue = make(chan models.VoteJob, 100) // Initialize the job queue once
@@ -52,7 +52,7 @@ func processJobQueue() {
 	for job := range jobQueue {
 		poll, err := models.UpdatePollVotes(job.PollID, job.OptionIndex)
 		if err != nil {
-			log.Printf("Failed to update vote: %v", err)
+			logrus.Errorf("Failed to update vote: %v", err)
 			continue
 		}
 
@@ -64,12 +64,12 @@ func processJobQueue() {
 					select {
 					case subscriber <- string(pollJSON):
 					default:
-						log.Printf("Failed to send update to subscriber")
+						logrus.Warn("Failed to send update to subscriber")
 					}
 				}
 			}
 		} else {
-			log.Printf("Failed to marshal poll JSON: %v", err)
+			logrus.Errorf("Failed to marshal poll JSON: %v", err)
 		}
 	}
 }
@@ -100,12 +100,12 @@ func PollsStream(c *gin.Context, pollID string) {
 		case pollUpdate := <-updateChannel:
 			_, err := fmt.Fprintf(c.Writer, "data: %s\n\n", pollUpdate)
 			if err != nil {
-				log.Printf("Client disconnected")
+				logrus.Info("Client disconnected")
 				return
 			}
 			c.Writer.Flush()
 		case <-c.Request.Context().Done():
-			log.Printf("Client disconnected")
+			logrus.Info("Client disconnected")
 			return
 		}
 	}

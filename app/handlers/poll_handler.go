@@ -42,8 +42,6 @@ func VotePoll(c *gin.Context) {
 	pollId, _ := uuid.Parse(c.Param("id"))
 	var vote models.VoteRequest
 
-	// TODO: handle error if no option selected
-	// TODO: also validate JSON data and ensure only one option is selected
 	if err := c.ShouldBindJSON(&vote); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

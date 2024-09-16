@@ -1,7 +1,6 @@
 package models
 
 import (
-	"log"
 	"sort"
 	"sync"
 	"time"
@@ -9,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/rachitamaharjan/poll/db"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -46,7 +46,10 @@ func GetPollByID(c *gin.Context, id uuid.UUID) (*Poll, error) {
 	poll := &Poll{}
 	result := db.DB.Preload("Options").First(poll, id)
 	if result.Error != nil {
-		log.Printf("Failed to create poll. Error: %v", result.Error)
+		logrus.WithFields(logrus.Fields{
+			"poll_id": id,
+			"error":   result.Error,
+		}).Error("Failed to fetch poll")
 		return nil, result.Error
 	}
 	// Sort the options by VoteCount in descending order
@@ -60,9 +63,18 @@ func GetPollByID(c *gin.Context, id uuid.UUID) (*Poll, error) {
 func SavePoll(c *gin.Context, poll Poll) (string, error) {
 	result := db.DB.Create(&poll)
 	if result.Error != nil {
-		log.Printf("Failed to create poll. Error: %v", result.Error)
+		logrus.WithFields(logrus.Fields{
+			"poll":  poll.Question,
+			"error": result.Error,
+		}).Error("Failed to create poll")
 		return "", result.Error
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"poll_id": poll.ID,
+		"poll":    poll.Question,
+	}).Info("Poll created successfully")
+
 	return poll.ID.String(), nil
 }
 
@@ -77,6 +89,11 @@ func UpdatePollVotes(pollID uuid.UUID, optionIndex int) (*Poll, error) {
 		Limit(1).            // Get only one option
 		First(&option).Error
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"poll_id":      pollID,
+			"option_index": optionIndex,
+			"error":        err,
+		}).Error("Failed to fetch option")
 		return nil, err
 	}
 
@@ -90,14 +107,27 @@ func UpdatePollVotes(pollID uuid.UUID, optionIndex int) (*Poll, error) {
 	// Save the updated option
 	err = db.DB.Save(&option).Error
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"option_id": option.ID,
+			"poll_id":   pollID,
+			"error":     err,
+		}).Error("Failed to update option votes")
 		return nil, err
 	}
 
 	// Fetch the updated poll with its options
 	err = db.DB.Where("id = ?", pollID).Preload("Options").First(&poll).Error
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"poll_id": pollID,
+			"error":   err,
+		}).Error("Failed to fetch updated poll")
 		return nil, err
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"poll_id": pollID,
+	}).Info("Poll votes updated successfully")
 
 	return &poll, nil
 }
