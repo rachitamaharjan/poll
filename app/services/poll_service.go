@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rachitamaharjan/poll/db"
 	"github.com/rachitamaharjan/poll/models"
 	"github.com/sirupsen/logrus"
 )
@@ -40,33 +41,62 @@ func CreatePoll(c *gin.Context, newPoll models.Poll) (string, error) {
 	return newPoll.ID.String(), nil
 }
 
-func VotePoll(pollId uuid.UUID, vote models.VoteRequest) {
+func VotePoll(c *gin.Context, pollId uuid.UUID, vote models.VoteRequest) *models.CustomError {
+	// Enqueue the vote job
+	err := enqueueVoteJob(c, pollId, vote.OptionIndex)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func enqueueVoteJob(c *gin.Context, pollId uuid.UUID, optionIndex int) *models.CustomError {
+	clientIP := c.ClientIP()
+	// Check for IP-based voting restrictions
+	poll, err := models.GetPollByID(c, pollId)
+	if err != nil {
+		return &models.CustomError{Message: err.Error()}
+	}
+	if !poll.AllowMultipleVotes {
+		var existingVote models.PollVote
+		err = db.DB.Where("poll_id = ? AND ip_address = ?", pollId, clientIP).First(&existingVote).Error
+		if err == nil {
+			return &models.CustomError{Message: models.ErrMultipleVotesNotAllowed, StatusCode: 400}
+		}
+	}
+
 	// Enqueue the vote job
 	jobQueue <- models.VoteJob{
 		PollID:      pollId,
-		OptionIndex: vote.OptionIndex,
+		OptionIndex: optionIndex,
+		ClientIP:    clientIP,
 	}
+	return nil
 }
 
 func processJobQueue() {
 	for job := range jobQueue {
-		poll, err := models.UpdatePollVotes(job.PollID, job.OptionIndex)
-		if err != nil {
-			logrus.Errorf("Failed to update vote: %v", err)
+		poll, jobErr := models.UpdatePollVotes(job.PollID, job.OptionIndex, job.ClientIP)
+		if jobErr != nil {
+			logrus.Errorf("Failed to update vote: %v", jobErr)
 			continue
 		}
 
 		// Notify all subscribers of this poll (SSE clients)
 		pollJSON, err := json.Marshal(poll)
 		if err == nil {
+			fmt.Print("pollSubscribers ", pollSubscribers, "pollid", poll.ID)
 			if subscribers, ok := pollSubscribers[poll.ID]; ok {
 				for _, subscriber := range subscribers {
 					select {
 					case subscriber <- string(pollJSON):
+						logrus.Infof("Sent update to subscriber for poll %v", poll.ID)
 					default:
 						logrus.Warn("Failed to send update to subscriber")
 					}
 				}
+			} else {
+				logrus.Warn("No subscribers found for poll %v", poll.ID)
 			}
 		} else {
 			logrus.Errorf("Failed to marshal poll JSON: %v", err)
@@ -79,7 +109,12 @@ func PollsStream(c *gin.Context, pollID string) {
 	updateChannel := make(chan string)
 
 	// Add the new subscriber to the pollSubscribers map
-	pollUUID, _ := uuid.Parse(pollID)
+	pollUUID, err := uuid.Parse(pollID)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Invalid poll ID"})
+		return
+	}
+
 	pollSubscribers[pollUUID] = append(pollSubscribers[pollUUID], updateChannel)
 
 	// Remove the client when they disconnect

@@ -47,7 +47,11 @@ func VotePoll(c *gin.Context) {
 		return
 	}
 
-	services.VotePoll(pollId, vote)
+	err := services.VotePoll(c, pollId, vote)
+	if err != nil {
+		c.JSON(err.StatusCode, gin.H{"error": err.Message})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Vote recorded"})
 }
