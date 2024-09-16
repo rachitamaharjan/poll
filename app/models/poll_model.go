@@ -2,12 +2,13 @@ package models
 
 import (
 	"log"
+	"sort"
 	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/rachitamaharjan/poll/db"
-	"gorm.io/gorm"
 )
 
 var (
@@ -16,8 +17,7 @@ var (
 
 // Poll represents a poll with a question and multiple options.
 type Poll struct {
-	gorm.Model
-	ID        uint `json:"id" gorm:"primaryKey;unique"`
+	ID        uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Question  string   `json:"question" gorm:"type:text"`
@@ -27,11 +27,10 @@ type Poll struct {
 
 // Option represents an individual poll option with a vote count.
 type Option struct {
-	gorm.Model
-	ID        uint   `gorm:"primaryKey"`
-	PollID    uint   `json:"pollId"`
-	Text      string `json:"text" gorm:"type:text"`
-	VoteCount int    `json:"voteCount" gorm:"default:0"`
+	ID        uint      `gorm:"primaryKey"`
+	PollID    uuid.UUID `json:"pollId"`
+	Text      string    `json:"text" gorm:"type:text"`
+	VoteCount int       `json:"voteCount" gorm:"default:0"`
 }
 
 type VoteRequest struct {
@@ -39,32 +38,36 @@ type VoteRequest struct {
 }
 
 type VoteJob struct {
-	PollID      uint
+	PollID      uuid.UUID
 	OptionIndex int
 }
 
-func GetPollByID(c *gin.Context, id uint) (*Poll, error) {
+func GetPollByID(c *gin.Context, id uuid.UUID) (*Poll, error) {
 	poll := &Poll{}
 	result := db.DB.Preload("Options").First(poll, id)
 	if result.Error != nil {
 		log.Printf("Failed to create poll. Error: %v", result.Error)
 		return nil, result.Error
 	}
+	// Sort the options by VoteCount in descending order
+	sort.Slice(poll.Options, func(i, j int) bool {
+		return poll.Options[i].VoteCount > poll.Options[j].VoteCount
+	})
 	return poll, nil
 }
 
 // Saves a poll
-func SavePoll(c *gin.Context, poll Poll) (int, error) {
+func SavePoll(c *gin.Context, poll Poll) (string, error) {
 	result := db.DB.Create(&poll)
 	if result.Error != nil {
 		log.Printf("Failed to create poll. Error: %v", result.Error)
-		return 0, result.Error
+		return "", result.Error
 	}
-	return int(poll.ID), nil
+	return poll.ID.String(), nil
 }
 
 // UpdatePollVotes increments the vote count for a specific option in the poll.
-func UpdatePollVotes(pollID uint, optionIndex int) (*Poll, error) {
+func UpdatePollVotes(pollID uuid.UUID, optionIndex int) (*Poll, error) {
 	var option Option
 	var poll Poll
 

@@ -17,6 +17,9 @@ func ConnectToDB() {
 	if err != nil {
 		panic("Error connecting to DB")
 	}
+	// Enable UUID extension if needed
+	DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
+
 }
 
 func CloseDBConnection(db *gorm.DB) error {

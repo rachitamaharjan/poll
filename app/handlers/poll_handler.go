@@ -3,16 +3,16 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/rachitamaharjan/poll/models"
 	"github.com/rachitamaharjan/poll/services"
 )
 
 // Get poll by ID
 func GetPollByID(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, _ := uuid.Parse(c.Param("id"))
 	poll, err := services.GetPollByID(c, id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -33,12 +33,13 @@ func CreatePoll(c *gin.Context) {
 	}
 
 	// Return a unique poll URL
-	c.JSON(http.StatusCreated, gin.H{"url": fmt.Sprintf("/polls/%d", pollID)})
+	pollURL := fmt.Sprintf("/polls/%s", pollID)
+	c.JSON(http.StatusCreated, gin.H{"url": pollURL})
 }
 
 // VotePoll handles the voting request from a user.
 func VotePoll(c *gin.Context) {
-	pollId, _ := strconv.Atoi(c.Param("id"))
+	pollId, _ := uuid.Parse(c.Param("id"))
 	var vote models.VoteRequest
 
 	// TODO: handle error if no option selected

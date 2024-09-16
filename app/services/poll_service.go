@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"strconv"
 	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/rachitamaharjan/poll/models"
 )
 
 var jobQueue = make(chan models.VoteJob, 100) // Initialize the job queue once
 var once sync.Once
-var pollSubscribers = make(map[uint][]chan string) // Keyed by Poll ID
+var pollSubscribers = make(map[uuid.UUID][]chan string) // Keyed by Poll ID
 
 func init() {
 	once.Do(func() {
@@ -21,27 +21,29 @@ func init() {
 	})
 }
 
-func GetPollByID(c *gin.Context, pollId int) (*models.Poll, error) {
-	poll, err := models.GetPollByID(c, uint(pollId))
+func GetPollByID(c *gin.Context, pollId uuid.UUID) (*models.Poll, error) {
+	poll, err := models.GetPollByID(c, pollId)
 	if err != nil {
 		return nil, err
 	}
 	return poll, nil
 }
 
-func CreatePoll(c *gin.Context, newPoll models.Poll) (int, error) {
+func CreatePoll(c *gin.Context, newPoll models.Poll) (string, error) {
+	newPoll.ID = uuid.New()
+
 	// Save to db
-	pollID, err := models.SavePoll(c, newPoll)
+	_, err := models.SavePoll(c, newPoll)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
-	return pollID, nil
+	return newPoll.ID.String(), nil
 }
 
-func VotePoll(pollId int, vote models.VoteRequest) {
+func VotePoll(pollId uuid.UUID, vote models.VoteRequest) {
 	// Enqueue the vote job
 	jobQueue <- models.VoteJob{
-		PollID:      uint(pollId),
+		PollID:      pollId,
 		OptionIndex: vote.OptionIndex,
 	}
 }
@@ -77,15 +79,15 @@ func PollsStream(c *gin.Context, pollID string) {
 	updateChannel := make(chan string)
 
 	// Add the new subscriber to the pollSubscribers map
-	pollIDUint, _ := strconv.ParseUint(pollID, 10, 32)
-	pollSubscribers[uint(pollIDUint)] = append(pollSubscribers[uint(pollIDUint)], updateChannel)
+	pollUUID, _ := uuid.Parse(pollID)
+	pollSubscribers[pollUUID] = append(pollSubscribers[pollUUID], updateChannel)
 
 	// Remove the client when they disconnect
 	defer func() {
-		subscribers := pollSubscribers[uint(pollIDUint)]
+		subscribers := pollSubscribers[pollUUID]
 		for i, subscriber := range subscribers {
 			if subscriber == updateChannel {
-				pollSubscribers[uint(pollIDUint)] = append(subscribers[:i], subscribers[i+1:]...)
+				pollSubscribers[pollUUID] = append(subscribers[:i], subscribers[i+1:]...)
 				break
 			}
 		}

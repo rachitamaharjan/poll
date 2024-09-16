@@ -6,5 +6,5 @@ import (
 )
 
 func SyncDB() {
-	db.DB.AutoMigrate(&models.User{}, &models.Poll{}, &models.Option{})
+	db.DB.AutoMigrate(&models.Poll{}, &models.Option{})
 }
