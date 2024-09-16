@@ -7,6 +7,7 @@ const usePollData = () => {
   const [poll, setPoll] = useState(null);
   const [loading, setLoading] = useState(false);  // For loading states
   const [error, setError] = useState(null);  // To handle errors
+  const [shareUrl, setShareUrl] = useState(''); // To store the share URL of the created poll
 
    // Create a new poll
    const createPoll = useCallback(async (pollData) => {
@@ -21,6 +22,7 @@ const usePollData = () => {
 
       const newPoll = response.data;
       setPolls((prevPolls) => [...prevPolls, newPoll]);
+      setShareUrl(newPoll.url);
     } catch (err) {
       console.error('Error creating poll:', err);
       setError('Failed to create poll');
@@ -103,7 +105,8 @@ const usePollData = () => {
     fetchPollById,
     votePoll,
     error,
-    loading
+    loading,
+    shareUrl
   };
 };
 

@@ -1,14 +1,17 @@
 import React, { useState, useContext, useCallback, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePollContext } from '../../context/PollContext';
-import ErrorBoundary from '../../components/ErrorBoundary';
+import ErrorBoundary from '../../components/ErrorBoundary/ErrorBoundary';
+import SuccessModal from '../../components/SuccessModal/SuccessModal';
+
 import './CreatePoll.css';
 
 const CreatePoll = () => {
-  const { createPoll } = usePollContext();
+  const { createPoll, shareUrl } = usePollContext();
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState([{ text: '' }]);
   const [error, setError] = useState(null);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
   const navigate = useNavigate();
 
   // Performance optimization with useCallback
@@ -37,10 +40,15 @@ const CreatePoll = () => {
 
     try {
       await createPoll({ question, options }); // Call Context API method to create poll
-      navigate('/polls') // Redirect to the polls page after successful creation
+      setSuccessModalOpen(true);
     } catch (error) {
       setError('Failed to create poll. Please try again.');
     }
+  };
+
+  const closeModal = () => {
+    setSuccessModalOpen(false);
+    navigate('/polls/create'); // Redirect to polls page after closing modal
   };
 
   return (
@@ -93,6 +101,12 @@ const CreatePoll = () => {
           Create Poll
         </button>
       </form>
+
+      <SuccessModal
+        isOpen={successModalOpen}
+        onClose={closeModal}
+        shareUrl={shareUrl}
+      />
     </div>
   );
 };

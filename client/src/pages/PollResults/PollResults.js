@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { usePollContext } from '../../context/PollContext';
@@ -11,6 +11,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const PollResults = () => {
   const { id } = useParams();
   const { poll, fetchPollById, error, loading } = usePollContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPollById(id);
@@ -21,7 +22,7 @@ const PollResults = () => {
   }, [poll]);
 
   if (error) {
-    return <p>Error loading poll: {error}</p>;
+    return <p className="error-message">Error loading poll: {error}</p>;
   }
 
   const getVotePercentage = (voteCount) => {
@@ -42,37 +43,42 @@ const PollResults = () => {
   };
 
   if (loading) {
-    return <p>Loading Poll...</p>;
+    return <p className="loading-message">Loading Poll...</p>;
   }
 
   return (
-    <>
-    {poll ? (
-      <div className="poll-results-container">
-        <h2>{poll.question}</h2>
-        <ul>
-          {poll.options?.map((option, index) => (
-            <li key={index}>
-              <div>
-                <span>{option?.text}</span>
-                <span>{option?.voteCount} votes ({getVotePercentage(option.voteCount)}%)</span>
+    <div className="poll-results-container">
+      {poll ? (
+        <>
+          <h2 className="poll-question">{poll.question}</h2>
+          <div className="poll-results-list">
+            {poll.options?.map((option, index) => (
+              <div key={index} className="poll-result-item">
+                <div className="poll-option-text">
+                  <span>{option.text}</span>
+                  <span className="poll-option-stats">{option.voteCount} votes ({getVotePercentage(option.voteCount)}%)</span>
+                </div>
+                <div className="progress-bar-container">
+                  <div 
+                    className="progress-bar" 
+                    style={{ width: `${getVotePercentage(option.voteCount)}%` }}
+                  ></div>
+                </div>
               </div>
-              <div style={{ background: "#ddd", height: "24px", width: "100%" }}>
-                <div style={{ width: `${getVotePercentage(option.voteCount)}%`, background: "#4caf50", height: "100%" }}></div>
-              </div>
-            </li>
-          ))}
-        </ul>
-        <p>Total Votes: {totalVotes}</p>
-        {/* Pie Chart */}
-        <div style={{ maxWidth: '400px', margin: 'auto' }}>
-          <Pie data={pieData} />
-        </div>
-      </div>
-    ) : (
-      <p>Loading Poll...</p>
-    )}
-  </>
+            ))}
+          </div>
+          <p className="total-votes">Total Votes: {totalVotes}</p>
+          <div className="pie-chart-container">
+            <Pie data={pieData} />
+          </div>
+          <button className="back-to-poll-button" onClick={() => navigate(`/polls/${id}`)}>
+            Back to Poll
+          </button>
+        </>
+      ) : (
+        <p className="loading-message">Poll not found.</p>
+      )}
+    </div>
   );
 };
 

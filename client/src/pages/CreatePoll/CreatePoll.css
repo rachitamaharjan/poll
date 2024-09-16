@@ -41,7 +41,7 @@ input[type="text"] {
 
 .remove-option-btn {
   margin-left: 10px;
-  background: #ff4d4d;
+  background: #782b2b;
   color: white;
   border: none;
   border-radius: 4px;
@@ -76,7 +76,7 @@ input[type="text"] {
 }
 
 .error-message {
-  color: #ff4d4d;
+  color: #782b2b;
   font-size: 14px;
   margin-top: 10px;
   text-align: center;
