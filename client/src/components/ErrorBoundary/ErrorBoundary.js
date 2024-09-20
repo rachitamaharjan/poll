@@ -1,26 +1,36 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
+const ErrorBoundary = ({ children }) => {
+  const { t } = useTranslation();
+  const [hasError, setHasError] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleError = (error) => {
+      setHasError(true);
+      console.error("ErrorBoundary caught an error", error);
+    };
+
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
+  if (hasError) {
+    return (
+      <div className="error-boundary">
+        <h1>{t('errorBoundary.title')}</h1>
+        <p>{t('errorBoundary.message')}</p>
+        <button onClick={() => window.location.reload()}>{t('errorBoundary.refresh')}</button>
+      </div>
+    );
   }
 
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
+  return children;
+};
 
-  componentDidCatch(error, info) {
-    console.error("ErrorBoundary caught an error", error, info);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <h1>Something went wrong.</h1>;
-    }
-
-    return this.props.children; 
-  }
-}
+ErrorBoundary.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default ErrorBoundary;

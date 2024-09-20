@@ -1,0 +1,53 @@
+{
+  "navbar": {
+    "home": "Home",
+    "create_poll": "Create Poll"
+  },
+  "home_page": {
+    "welcome_message": "Welcome to the Polling App",
+    "create_poll": "Create a Poll"
+  },
+  "create_poll": {
+    "title": "Create a Poll",
+    "question_label": "Poll Question",
+    "question_placeholder": "Enter your poll question",
+    "options_label": "Poll Options",
+    "option": "Option",
+    "add_option": "Add Option",
+    "remove_option": "Remove",
+    "allow_multiple_votes": "Allow multiple votes per user",
+    "submit_button": "Create Poll",
+    "error": {
+      "empty_fields": "Please provide a question and all poll options.",
+      "creation_failed": "Failed to create poll. Please try again."
+    }
+  },
+  "loading": "Loading...",
+  "success_modal": {
+    "title": "Poll Created Successfully!",
+    "message": "Your poll has been created. Share it using the link below:",
+    "open_button": "Open",
+    "close_button": "Close"
+  },
+  "poll_detail": {
+    "loading": "Loading Poll...",
+    "votes": "votes",
+    "total_votes": "Total Votes: {{count}}",
+    "be_the_first": "Be the first to vote!",
+    "view_results": "View Results",
+    "not_found": "Poll not found."
+  },
+  "poll_results": {
+    "error_loading": "Error loading poll: {{error}}",
+    "votes": "Votes",
+    "loading": "Loading Poll...",
+    "total_votes": "Total Votes: {{count}}",
+    "back_to_poll": "Back to Poll",
+    "not_found": "Poll not found."
+  },
+  "errorBoundary": {
+    "title": "Something went wrong.",
+    "message": "We're sorry, but something went wrong. Please try again later.",
+    "refresh": "Refresh"
+  }
+}

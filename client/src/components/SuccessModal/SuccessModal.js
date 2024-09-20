@@ -1,7 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './SuccessModal.css';
 
 const SuccessModal = ({ isOpen, onClose, shareUrl }) => {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   const handleOpenClick = () => {
@@ -11,8 +14,8 @@ const SuccessModal = ({ isOpen, onClose, shareUrl }) => {
   return (
     <div className="success-modal-overlay">
       <div className="success-modal-content">
-        <h3>Poll Created Successfully!</h3>
-        <p>Your poll has been created. Share it using the link below:</p>
+        <h3>{t('success_modal.title')}</h3>
+        <p>{t('success_modal.message')}</p>
         <div className="share-link-container">
           <input
             type="text"
@@ -21,11 +24,11 @@ const SuccessModal = ({ isOpen, onClose, shareUrl }) => {
             className="share-link"
           />
           <button onClick={handleOpenClick} className="open-link-btn">
-            Open
+            {t('success_modal.open_button')}
           </button>
         </div>
         <button onClick={onClose} className="close-modal-btn">
-          Close
+          {t('success_modal.close_button')}
         </button>
       </div>
     </div>

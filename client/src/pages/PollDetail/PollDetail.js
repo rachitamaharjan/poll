@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePollContext } from '../../context/PollContext';
-
+import { useTranslation } from 'react-i18next';
 import './PollDetail.css';
 
 const PollDetail = () => {
   const { id } = useParams();
   const { poll, fetchPollById, votePoll, status, error } = usePollContext();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +25,7 @@ const PollDetail = () => {
   }, [id]);
 
   const handleVote = (optionIndex) => {
-    votePoll(id, optionIndex)
+    votePoll(id, optionIndex);
   };
 
   const handleViewResults = () => {
@@ -36,7 +37,7 @@ const PollDetail = () => {
   return (
     <div className="poll-detail-container">
       {loading ? (
-        <p className="loading-message">Loading Poll...</p>
+        <p className="loading-message">{t('poll_detail.loading')}</p>
       ) : (
         <div className="poll-detail-content">
           {poll ? (
@@ -52,15 +53,15 @@ const PollDetail = () => {
                       >
                         {option.text}
                       </button>
-                      <span className="poll-option-votes"> - {option.voteCount} votes</span>
+                      <span className="poll-option-votes"> - {option.voteCount} {t('poll_detail.votes')}</span>
                     </li>
                   ))}
                 </ul>
               </div>
               {totalVotes > 0 ? (
-                <p className="total-votes">Total Votes: {totalVotes}</p>
+                <p className="total-votes">{t('poll_detail.total_votes', { count: totalVotes })}</p>
               ) : (
-                <p className="total-votes">Be the first to vote!</p>
+                <p className="total-votes">{t('poll_detail.be_the_first')}</p>
               )}
               {status && <p className="vote-status-message">{status}</p>}
               {error && <p className="vote-error-message">{error}</p>}
@@ -68,11 +69,11 @@ const PollDetail = () => {
                 className="view-results-button" 
                 onClick={handleViewResults}
               >
-                View Results
+                {t('poll_detail.view_results')}
               </button>
             </>
           ) : (
-            <p className="loading-message">Poll not found.</p>
+            <p className="loading-message">{t('poll_detail.not_found')}</p>
           )}
         </div>
       )}

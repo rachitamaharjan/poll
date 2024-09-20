@@ -1,22 +1,26 @@
+import React from 'react';
 import './App.css';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { PollProvider } from './context/PollContext';
 import CreatePoll from './pages/CreatePoll/CreatePoll';
 import Home from './pages/Home/Home';
 import PollDetail from './pages/PollDetail/PollDetail';
 import PollResults from './pages/PollResults/PollResults';
-
+import NavBar from './components/NavBar/NavBar';
+import { useTranslation } from 'react-i18next';
 
 function App() {
+  const { i18n } = useTranslation();
+  const currentLanguage = i18n.language;
+
+  const handleLanguageChange = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
   return (
     <PollProvider>
-      <div>
-        <nav>
-            <ul>
-                <li><Link to="/">Home</Link></li>
-                <li><Link to="/polls/create/">Create Poll</Link></li>
-            </ul>
-        </nav>
+      <div className="app-container">
+        <NavBar currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange} />
         <Routes>
           <Route path="/" exact element={<Home />} />
           <Route path="/polls/create" element={<CreatePoll />} />
@@ -24,7 +28,7 @@ function App() {
           <Route path="/polls/:id/results" element={<PollResults />} />
         </Routes>
       </div>
-  </PollProvider>
+    </PollProvider>
   );
 }
 

@@ -1,5 +1,6 @@
-import React, { useState, useContext, useCallback, Suspense, lazy } from 'react';
+import React, { useState, useCallback, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { usePollContext } from '../../context/PollContext';
 import ErrorBoundary from '../../components/ErrorBoundary/ErrorBoundary';
 import SuccessModal from '../../components/SuccessModal/SuccessModal';
@@ -8,6 +9,7 @@ import './CreatePoll.css';
 
 const CreatePoll = () => {
   const { createPoll, shareUrl } = usePollContext();
+  const { t } = useTranslation();
   const [question, setQuestion] = useState('');
   const [allowMultipleVotes, setAllowMultipleVotes] = useState(false);
   const [options, setOptions] = useState([{ text: '' }]);
@@ -35,7 +37,7 @@ const CreatePoll = () => {
     event.preventDefault();
     
     if (!question || options.some(option => option.text.trim() === '')) {
-      setError('Please provide a question and all poll options.');
+      setError(t('create_poll.error.empty_fields'));
       return;
     }
 
@@ -43,7 +45,7 @@ const CreatePoll = () => {
       await createPoll({ question, options, allowMultipleVotes }); // Call Context API method to create poll
       setSuccessModalOpen(true);
     } catch (error) {
-      setError('Failed to create poll. Please try again.');
+      setError(t('create_poll.error.creation_failed'));
     }
   };
 
@@ -54,29 +56,29 @@ const CreatePoll = () => {
 
   return (
     <div className="create-poll-container">
-      <h2>Create a Poll</h2>
+      <h2>{t('create_poll.title')}</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="question">Poll Question:</label>
+          <label htmlFor="question">{t('create_poll.question_label')}:</label>
           <input
             type="text"
             id="question"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Enter your poll question"
+            placeholder={t('create_poll.question_placeholder')}
             required
           />
         </div>
 
         <div className="form-group">
-          <label>Poll Options:</label>
+          <label>{t('create_poll.options_label')}:</label>
           {options.map((option, index) => (
             <div key={index} className="poll-option">
               <input
                 type="text"
                 value={option.text}
                 onChange={(e) => handleOptionChange(index, e)}
-                placeholder={`Option ${index + 1}`}
+                placeholder={`${t('create_poll.option')} ${index + 1}`}
                 required
               />
               {options.length > 1 && (
@@ -85,14 +87,14 @@ const CreatePoll = () => {
                   onClick={() => removeOption(index)}
                   className="remove-option-btn"
                 >
-                  Remove
+                  {t('create_poll.remove_option')}
                 </button>
               )}
             </div>
           ))}
 
           <button type="button" onClick={addOption} className="add-option-btn">
-            Add Option
+            {t('create_poll.add_option')}
           </button>
         </div>
 
@@ -103,13 +105,13 @@ const CreatePoll = () => {
             checked={allowMultipleVotes}
             onChange={(e) => setAllowMultipleVotes(e.target.checked)}
           />
-          <label htmlFor="allowMultipleVotes">Allow multiple votes per user</label>
+          <label htmlFor="allowMultipleVotes">{t('create_poll.allow_multiple_votes')}</label>
         </div>
-        
+
         {error && <p className="error-message">{error}</p>}
 
         <button type="submit" className="submit-btn">
-          Create Poll
+          {t('create_poll.submit_button')}
         </button>
       </form>
 
